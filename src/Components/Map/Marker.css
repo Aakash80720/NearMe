@@ -1,0 +1,24 @@
+.img .paper{
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+}
+.img:hover .paper{
+    opacity: 1;
+    pointer-events: auto;
+}
+.img{
+    position: relative;
+    cursor: pointer;
+
+}
+.img .paper::before{
+    position: absolute;
+    content: "";
+    height: 15px;
+    width: 15px;
+    background: #fff;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+}
