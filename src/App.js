@@ -7,9 +7,15 @@ import { getPlaceData } from './api/Index';
 import Map from './Components/Map/Map';
 const App = () =>{
     const [Places, setPlaces] = useState([])
+    const [filteredPlaces, setFilteredPlaces] = useState([])
     const [loading, setLoading] = useState(true)
     const [coordinates, setCoordinates] = useState({})
     const [bounds, setBounds] = useState(null)
+    const [childClicked, setChildClicked] = useState(null)
+    const [type, setType] = useState('restaurants')
+    const [rating, setRating] = useState('')
+    const [autocomplete, setAutocomplete] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         navigator.geolocation.getCurrentPosition(({coords:{latitude,longitude}}) => {
@@ -18,38 +24,64 @@ const App = () =>{
         })    
     }, [])
     
+    useEffect(() => {
+      const filteredPlaces = Places.filter((place) => place.rating > rating)
+        setFilteredPlaces(filteredPlaces);
+      
+    }, [rating])
+    
+    const onLoad = (autoC) => setAutocomplete(autoC);
+
+  const onPlaceChanged = () => {
+    const lat = autocomplete.getPlace().geometry.location.lat();
+    const lng = autocomplete.getPlace().geometry.location.lng();
+
+    setCoordinates({ lat, lng });
+  };
 
     useEffect(() => { 
         console.log(coordinates,bounds)
         if(bounds){
             console.log("test")
-            getPlaceData(bounds.sw,bounds.ne).then((data)=>{
+            getPlaceData(type,bounds.sw,bounds.ne).then((data)=>{
             console.log(data);
-            setPlaces(data);
+            setIsLoading(true)
+            setRating('');
+            setFilteredPlaces([])
+            setPlaces(data?.filter((place) => place.name));
         })
         }
          
       return () => {
       }
-    }, [coordinates,bounds])
+    }, [type,coordinates,bounds])
     
     return(
         <div>
             <CssBaseline/>
-            <Header/>
+            <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} />
             <Grid container spacing={1} style={{width : '100%',marginTop:'5%'}}>
                 <Grid item xs={12} md={4}>
-                    <List Places = {Places}/>
+                    <List 
+                    Places = {filteredPlaces.length ? filteredPlaces : Places}
+                    childClicked = {childClicked}
+                    isLoading={isLoading}
+                    type={type}
+                    setType = {setType}
+                    rating = {rating}
+                    setRating ={setRating}
+                    />
                 </Grid>
                 <Grid item xs={12} md={8}>
                 <div style={{ margin: '0px'}}>       
             {
                 !loading ? 
                 <Map
-                    places = {Places}
+                    places = {filteredPlaces.length ? filteredPlaces : Places}
                     center={coordinates}
                     setCoordinates = {setCoordinates}     
                     setBounds = {setBounds}  
+                    setChildClicked = {setChildClicked}
                 />: 
                 <div className="flex justify-center items-center bg-[#b7cbd8] h-screen">
                     <div

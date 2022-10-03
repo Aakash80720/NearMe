@@ -3,7 +3,7 @@ import {Autocomplete, AutoComplete} from '@react-google-maps/api'
 import {AppBar,Toolbar,Typography,InputBase,Box} from '@material-ui/core'
 import { SearchOutlined } from '@material-ui/icons'
 import useStyles from './styles.js';
-function Header() {
+function Header({ onPlaceChanged, onLoad }) {
     const classes = useStyles();
   return (
     <AppBar position='fixed'>
@@ -15,14 +15,14 @@ function Header() {
                 <Typography variant="h6" className={classes.title}>
                     Explore More & More
                 </Typography>
-                {/* <Autocomplete> */}
+                <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
                             <SearchOutlined/>
                         </div>
                         <InputBase placeholder='Find Around Mee..' classes={{root:classes.inputRoot,input:classes.inputInput}}/>
                     </div>  
-                {/* </Autocomplete> */}
+                </Autocomplete>
             </Box>
             
         </Toolbar>
